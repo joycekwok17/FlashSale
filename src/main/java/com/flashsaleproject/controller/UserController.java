@@ -32,6 +32,31 @@ public class UserController extends BaseController {
     @Autowired
     private HttpServletRequest httpServletRequest;
 
+    @RequestMapping(value = "/login", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType login(@RequestParam(name = "telphone") String telphone,
+                                  @RequestParam(name = "password") String password) throws BusinessException, NoSuchAlgorithmException {
+        // parameter validation
+        if (org.apache.commons.lang3.StringUtils.isEmpty(telphone) ||
+                org.apache.commons.lang3.StringUtils.isEmpty(password)) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+        // user login service, verify username and password
+        UserModel userModel = userService.login(telphone, this.encodeByMd5(password));
+
+        // put user info into session
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER", userModel);
+
+        return CommonReturnType.create(null);
+    }
+
+    public String encodeByMd5(String str) throws NoSuchAlgorithmException {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        Base64.Encoder encoder = Base64.getEncoder();
+        return encoder.encodeToString(md5.digest(str.getBytes()));
+    }
+
     @RequestMapping(value = "/register", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType register(@RequestParam(name = "telphone") String telphone,
@@ -55,12 +80,6 @@ public class UserController extends BaseController {
         userModel.setEncrptPassword(this.encodeByMd5(password));
         userService.register(userModel);
         return CommonReturnType.create(null);
-    }
-
-    public String encodeByMd5(String str) throws NoSuchAlgorithmException {
-        MessageDigest md5 = MessageDigest.getInstance("MD5");
-        Base64.Encoder encoder = Base64.getEncoder();
-        return encoder.encodeToString(md5.digest(str.getBytes()));
     }
 
     @RequestMapping(value = "/getOtp", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
