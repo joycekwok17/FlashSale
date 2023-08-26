@@ -8,9 +8,12 @@ import com.flashsaleproject.error.BusinessException;
 import com.flashsaleproject.error.EmBusinessError;
 import com.flashsaleproject.service.UserService;
 import com.flashsaleproject.service.model.UserModel;
+import com.flashsaleproject.validator.ValidationResult;
+import com.flashsaleproject.validator.ValidatorImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserPasswordDOMapper userPasswordDOMapper;
 
+    @Autowired
+    private ValidatorImpl validator;
+
     @Override
     public UserModel getUserById(Integer id) {
         UserDO userDO = userDOMapper.selectByPrimaryKey(id);
@@ -40,27 +46,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional // add transactional annotation to make sure userDO and userPasswordDO are inserted into database at the same time
+    @Transactional
+    // add transactional annotation to make sure userDO and userPasswordDO are inserted into database at the same time
     public void register(UserModel userModel) throws BusinessException {
         if (userModel == null) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
+
+        // validate userModel
+        ValidationResult result = validator.validate(userModel);
+        if (result.isHasErrors()) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, result.getErrMsg());
+        }
+
         if (StringUtils.isEmpty(userModel.getName())
                 || userModel.getGender() == null
                 || userModel.getAge() == null
                 || StringUtils.isEmpty(userModel.getTelphone())) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
+
         // convert userModel to userDO
         UserDO userDO = convertFromUserModel(userModel);
         // insert userDO to database
-        userDOMapper.insertSelective(userDO);
+        try {
+            userDOMapper.insertSelective(userDO);
+        } catch (DuplicateKeyException exception) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "telphone number already registered");
+        }
 
+        userModel.setId(userDO.getId());
         UserPasswordDO userPasswordDO = convertFromUserPasswordModel(userModel);
         userPasswordDOMapper.insertSelective(userPasswordDO);
-
-        return;
-
     }
 
     private UserDO convertFromUserModel(UserModel userModel) {

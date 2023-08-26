@@ -7,12 +7,14 @@ import com.flashsaleproject.response.CommonReturnType;
 import com.flashsaleproject.service.UserService;
 import com.flashsaleproject.service.model.UserModel;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Random;
 
 /**
@@ -22,7 +24,7 @@ import java.util.Random;
  */
 @Controller("user")
 @RequestMapping("/user") // http://localhost:8080/user -> UserController
-@CrossOrigin(originPatterns = "*", allowCredentials = "true",allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*") //
 public class UserController extends BaseController {
     @Autowired
     private UserService userService;
@@ -30,17 +32,17 @@ public class UserController extends BaseController {
     @Autowired
     private HttpServletRequest httpServletRequest;
 
-    @RequestMapping(value = "/register", method = {RequestMethod.POST}, consumes={CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "/register", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
-    public CommonReturnType register(@RequestParam(name="telphone")String telphone,
-                                     @RequestParam(name="otpCode")String otpCode,
-                                     @RequestParam(name="name")String name,
-                                     @RequestParam(name="gender") Integer gender,
-                                     @RequestParam(name="age") Integer age,
-                                     @RequestParam(name="password") String password) throws BusinessException {
+    public CommonReturnType register(@RequestParam(name = "telphone") String telphone,
+                                     @RequestParam(name = "otpCode") String otpCode,
+                                     @RequestParam(name = "name") String name,
+                                     @RequestParam(name = "gender") Integer gender,
+                                     @RequestParam(name = "age") Integer age,
+                                     @RequestParam(name = "password") String password) throws BusinessException, NoSuchAlgorithmException {
         // verify otp code is consistent with the telephone number
         String inSessionOtpCode = (String) this.httpServletRequest.getSession().getAttribute(telphone);
-        if(!com.alibaba.druid.util.StringUtils.equals(otpCode, inSessionOtpCode)) {
+        if (!com.alibaba.druid.util.StringUtils.equals(otpCode, inSessionOtpCode)) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "otp code is not correct");
         }
         // user register flow
@@ -50,12 +52,18 @@ public class UserController extends BaseController {
         userModel.setGender(Byte.parseByte(String.valueOf(gender)));
         userModel.setTelphone(telphone);
         userModel.setRegisterMode("byphone");
-        userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));
+        userModel.setEncrptPassword(this.encodeByMd5(password));
         userService.register(userModel);
         return CommonReturnType.create(null);
     }
 
-    @RequestMapping(value = "/getOtp", method = {RequestMethod.POST}, consumes={CONTENT_TYPE_FORMED})
+    public String encodeByMd5(String str) throws NoSuchAlgorithmException {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        Base64.Encoder encoder = Base64.getEncoder();
+        return encoder.encodeToString(md5.digest(str.getBytes()));
+    }
+
+    @RequestMapping(value = "/getOtp", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType getOtp(@RequestParam(name = "telphone") String telphone) {
         // according to telephone generate otp code
