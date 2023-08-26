@@ -1,5 +1,11 @@
 package com.flashsaleproject.service.model;
 
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 /**
  * @author Xuanchi Guo
  * @project flashsale
@@ -7,12 +13,20 @@ package com.flashsaleproject.service.model;
  */
 public class UserModel {
     private Integer id;
+    @NotBlank(message = "Name cannot be empty")
     private String name;
+    @NotNull(message = "gender cannot be empty")
     private Byte gender;
+    @NotNull(message = "Age cannot be empty")
+    @Min(value = 0, message = "Age cannot be less than 0")
+    @Max(value = 150, message = "Age cannot be greater than 150")
     private Integer age;
+    @NotBlank(message = "telphone cannot be empty")
     private String telphone;
     private String registerMode;
     private String thirdPartyId;
+    @NotBlank(message = "password cannot be empty")
+
     private String encrptPassword; // This is not in UserDO, but in UserPasswordDO
 
     public String getEncrptPassword() {
