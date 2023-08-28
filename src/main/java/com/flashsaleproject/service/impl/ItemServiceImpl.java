@@ -44,7 +44,12 @@ public class ItemServiceImpl implements ItemService {
         // convert itemModel to itemDO
         ItemDO itemDO = this.convertFromItemModel(itemModel);
         // write into database
-        itemDOMapper.insertSelective(itemDO);
+        try {
+            itemDOMapper.insertSelective(itemDO);
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new BusinessException(EmBusinessError.UNKNOWN_ERROR, "Failed to create item");
+        }
         // get the id from database and set it to itemModel
         itemModel.setId(itemDO.getId());
         ItemStockDO itemStockDO = this.convertItemStockDOFromItemModel(itemModel);
