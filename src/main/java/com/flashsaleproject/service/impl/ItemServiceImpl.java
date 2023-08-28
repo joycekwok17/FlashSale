@@ -118,4 +118,18 @@ public class ItemServiceImpl implements ItemService {
         ItemModel itemModel = this.convertFromItemDO(itemDO, itemStockDO);
         return itemModel;
     }
+
+    @Override
+    @Transactional
+    public boolean decreaseStock(Integer itemId, Integer amount) throws BusinessException {
+        int affectedRow = itemStockDOMapper.decreaseStock(itemId, amount);
+        if (affectedRow > 0){
+            // update the stock successfully
+            return true;
+        } else {
+            // update the stock failed
+            return false;
+        }
+    }
+
 }

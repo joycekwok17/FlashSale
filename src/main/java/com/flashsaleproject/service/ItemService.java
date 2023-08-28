@@ -14,4 +14,7 @@ public interface ItemService {
     ItemModel createItem(ItemModel itemModel) throws BusinessException;
     List<ItemModel> listItem();
     ItemModel getItemById(Integer id);
+
+    // decrease the stock
+    boolean decreaseStock(Integer itemId, Integer amount) throws BusinessException;
 }

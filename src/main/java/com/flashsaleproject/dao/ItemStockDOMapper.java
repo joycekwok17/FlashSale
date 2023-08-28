@@ -1,6 +1,7 @@
 package com.flashsaleproject.dao;
 
 import com.flashsaleproject.dataObject.ItemStockDO;
+import org.apache.ibatis.annotations.Param;
 
 public interface ItemStockDOMapper {
     /**
@@ -51,4 +52,6 @@ public interface ItemStockDOMapper {
      * @mbg.generated Mon Aug 28 14:39:46 CEST 2023
      */
     int updateByPrimaryKey(ItemStockDO record);
+    int decreaseStock(@Param("itemId") Integer itemId, @Param("amount") Integer amount);
+
 }

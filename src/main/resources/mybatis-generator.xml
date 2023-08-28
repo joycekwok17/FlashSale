@@ -38,12 +38,12 @@
 <!--               enableDeleteByExample="false" enableSelectByExample="false"-->
 <!--               enableUpdateByExample="false" selectByExampleQueryId="false"/>-->
 
-        <table tableName="item" domainObjectName="ItemDO" enableCountByExample="false"
+        <table tableName="order_info" domainObjectName="OrderDO" enableCountByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                enableUpdateByExample="false" selectByExampleQueryId="false"/>
-        <table tableName="item_stock" domainObjectName="ItemStockDO"
-               enableCountByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               enableUpdateByExample="false" selectByExampleQueryId="false"/>
+<!--        <table tableName="item_stock" domainObjectName="ItemStockDO"-->
+<!--               enableCountByExample="false"-->
+<!--               enableDeleteByExample="false" enableSelectByExample="false"-->
+<!--               enableUpdateByExample="false" selectByExampleQueryId="false"/>-->
     </context>
 </generatorConfiguration>

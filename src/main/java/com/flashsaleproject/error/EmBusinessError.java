@@ -12,6 +12,7 @@ public enum EmBusinessError implements CommonError {
     // 1xxxx is the general error type for user related error
     USER_NOT_EXIST(20001, "User does not exist"),
     USER_LOGIN_FAIL(20002, "User telphone or password is not correct"),
+    STOCK_NOT_ENOUGH(30001, "Stock is not enough"),
     ;
 
     private int errCode;
