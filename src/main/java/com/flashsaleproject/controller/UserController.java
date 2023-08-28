@@ -7,6 +7,7 @@ import com.flashsaleproject.response.CommonReturnType;
 import com.flashsaleproject.service.UserService;
 import com.flashsaleproject.service.model.UserModel;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,7 +24,7 @@ import java.util.Random;
  * @created 8/24/23
  */
 @Controller("user")
-@RequestMapping("/user") // http://localhost:8080/user -> UserController
+@RequestMapping("/user") // http://localhost:8090/user -> UserController
 @CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*") //
 public class UserController extends BaseController {
     @Autowired
@@ -37,8 +38,8 @@ public class UserController extends BaseController {
     public CommonReturnType login(@RequestParam(name = "telphone") String telphone,
                                   @RequestParam(name = "password") String password) throws BusinessException, NoSuchAlgorithmException {
         // parameter validation
-        if (org.apache.commons.lang3.StringUtils.isEmpty(telphone) ||
-                org.apache.commons.lang3.StringUtils.isEmpty(password)) {
+        if (StringUtils.isEmpty(telphone) ||
+                StringUtils.isEmpty(password)) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
         // user login service, verify username and password

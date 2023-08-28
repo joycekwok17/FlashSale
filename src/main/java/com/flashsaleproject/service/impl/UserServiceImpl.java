@@ -54,8 +54,8 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
 
-        // validate userModel
-        ValidationResult result = validator.validate(userModel);
+        // validate userModel using validator, replace the following commented code
+        ValidationResult result = validator.validate(userModel); // annotation
         if (result.isHasErrors()) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, result.getErrMsg());
         }
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
         // convert userModel to userDO
         UserDO userDO = convertFromUserModel(userModel);
-        // insert userDO to database
+        // insert userDO to database (userDOMapper)
         try {
             userDOMapper.insertSelective(userDO);
         } catch (DuplicateKeyException exception) {

@@ -8,7 +8,7 @@ package com.flashsaleproject.error;
 public enum EmBusinessError implements CommonError {
     // 00001 is the general error type for parameter related error
     PARAMETER_VALIDATION_ERROR(10001, "Invalid parameter"),
-    UNKNOWN_ERROR(100002, "Unknown error"),
+    UNKNOWN_ERROR(10002, "Unknown error"),
     // 1xxxx is the general error type for user related error
     USER_NOT_EXIST(20001, "User does not exist"),
     USER_LOGIN_FAIL(20002, "User telphone or password is not correct"),
