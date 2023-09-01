@@ -72,13 +72,15 @@ public class UserServiceImpl implements UserService {
         // insert userDO to database (userDOMapper)
         try {
             userDOMapper.insertSelective(userDO);
+//            userDOMapper.insert(userDO);
         } catch (DuplicateKeyException exception) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "telphone number already registered");
         }
 
         userModel.setId(userDO.getId());
         UserPasswordDO userPasswordDO = convertFromUserPasswordModel(userModel);
-        userPasswordDOMapper.insertSelective(userPasswordDO);
+            userPasswordDOMapper.insertSelective(userPasswordDO);
+
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.flashsaleproject.service;
 
 import com.flashsaleproject.error.BusinessException;
 import com.flashsaleproject.service.model.ItemModel;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,4 +18,7 @@ public interface ItemService {
 
     // decrease the stock
     boolean decreaseStock(Integer itemId, Integer amount) throws BusinessException;
+
+    @Transactional
+    void increaseSales(Integer itemId, Integer amount) throws BusinessException;
 }

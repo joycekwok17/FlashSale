@@ -11,6 +11,6 @@ import com.flashsaleproject.service.model.UserModel;
 public interface UserService {
 
     UserModel getUserById(Integer id);
-    void register(UserModel userModel) throws BusinessException;
+    void register(UserModel userModel) throws Exception;
     UserModel login(String telphone, String encryptPassword) throws BusinessException;
 }

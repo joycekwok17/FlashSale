@@ -1,7 +1,9 @@
 package com.flashsaleproject.service.impl;
 
 import com.flashsaleproject.dao.OrderDOMapper;
+import com.flashsaleproject.dao.SequenceDOMapper;
 import com.flashsaleproject.dataObject.OrderDO;
+import com.flashsaleproject.dataObject.SequenceDO;
 import com.flashsaleproject.error.BusinessException;
 import com.flashsaleproject.error.EmBusinessError;
 import com.flashsaleproject.service.OrderService;
@@ -11,11 +13,11 @@ import com.flashsaleproject.service.model.UserModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 /**
  * @author Xuanchi Guo
@@ -33,6 +35,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderDOMapper orderDOMapper;
+
+    @Autowired
+    private SequenceDOMapper sequenceDOMapper;
 
     @Transactional
     @Override
@@ -62,26 +67,44 @@ public class OrderServiceImpl implements OrderService {
         orderModel.setAmount(amount);
         orderModel.setItemPrice(itemModel.getPrice());
         orderModel.setOrderPrice(itemModel.getPrice().multiply(new java.math.BigDecimal(amount)));
+
         // generate the order id and set it to orderModel
         orderModel.setId(generateOrderId());
         OrderDO orderDO = this.convertFromOrderModel(orderModel);
         orderDOMapper.insertSelective(orderDO);
+        itemService.increaseSales(itemId, amount);
         // return the orderModel to the controller
         return orderModel;
     }
 
-    private String generateOrderId() {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public String generateOrderId() {
         StringBuilder stringBuilder = new StringBuilder();
+
         // generate the first 8 digits of the order id according to the current time
         LocalDateTime now = LocalDateTime.now(); // get the current time
         String nowDate = now.format(DateTimeFormatter.ISO_DATE).replace("-", ""); // convert the time to string
         stringBuilder.append(nowDate);
 
-        // generate the middle 6 digits of the order id according to the sequence
+        // generate the middle 6 digits of the order id according to the sequence number of the order
+        // get the current sequence number
+        int sequence = 0;
+        SequenceDO sequenceDO = sequenceDOMapper.getSequenceByName("order_info");
+        sequence = sequenceDO.getCurrentValue();
+        sequenceDO.setCurrentValue(sequence + sequenceDO.getStep());
+        sequenceDOMapper.updateByPrimaryKeySelective(sequenceDO);
+
+        // convert the sequence number to string
+        String sequenceStr = String.valueOf(sequence);
+        // fill the sequence number with 0 to make it 6 digits
+        for (int i = 0; i < 6 - sequenceStr.length(); i++) {
+            stringBuilder.append(0);
+        }
+        stringBuilder.append(sequenceStr);
 
         //generate the last 2 digits of the order id
-
-        return null;
+        stringBuilder.append("00");
+        return stringBuilder.toString();
     }
 
     private OrderDO convertFromOrderModel(OrderModel orderModel) {
