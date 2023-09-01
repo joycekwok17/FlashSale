@@ -2,6 +2,7 @@ package com.flashsaleproject.service;
 
 import com.flashsaleproject.error.BusinessException;
 import com.flashsaleproject.service.model.OrderModel;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Xuanchi Guo
@@ -9,6 +10,7 @@ import com.flashsaleproject.service.model.OrderModel;
  * @created 8/28/23
  */
 public interface OrderService {
-    OrderModel createOrder(Integer userId, Integer itemId, Integer amount) throws BusinessException;
 
+    @Transactional
+    OrderModel createOrder(Integer userId, Integer itemId, Integer promoId, Integer amount) throws BusinessException;
 }

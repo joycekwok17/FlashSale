@@ -41,4 +41,7 @@ public class ItemModel {
     @NotBlank(message = "item img url cannot be empty")
     private String imgUrl;
 
+    // if promoModel is not null, then the item has a promo activity
+    private PromoModel promoModel;
+
 }

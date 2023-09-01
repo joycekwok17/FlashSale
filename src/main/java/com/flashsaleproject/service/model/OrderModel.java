@@ -12,10 +12,21 @@ public class OrderModel {
     private String id;
     private Integer userId;
     private Integer itemId;
+    private Integer promoId;
+    // if promoId is not null, then itemPrice is promoPrice
     private BigDecimal itemPrice;
     //
     private Integer amount;
+    // if promoId is not null, then orderPrice is promoPrice * amount
     private BigDecimal orderPrice;
+
+    public Integer getPromoId() {
+        return promoId;
+    }
+
+    public void setPromoId(Integer promoId) {
+        this.promoId = promoId;
+    }
 
     public BigDecimal getItemPrice() {
         return itemPrice;

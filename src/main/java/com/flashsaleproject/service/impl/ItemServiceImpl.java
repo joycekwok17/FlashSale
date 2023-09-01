@@ -2,12 +2,16 @@ package com.flashsaleproject.service.impl;
 
 import com.flashsaleproject.dao.ItemDOMapper;
 import com.flashsaleproject.dao.ItemStockDOMapper;
+import com.flashsaleproject.dao.PromoDOMapper;
 import com.flashsaleproject.dataObject.ItemDO;
 import com.flashsaleproject.dataObject.ItemStockDO;
+import com.flashsaleproject.dataObject.PromoDO;
 import com.flashsaleproject.error.BusinessException;
 import com.flashsaleproject.error.EmBusinessError;
 import com.flashsaleproject.service.ItemService;
+import com.flashsaleproject.service.PromoService;
 import com.flashsaleproject.service.model.ItemModel;
+import com.flashsaleproject.service.model.PromoModel;
 import com.flashsaleproject.validator.ValidationResult;
 import com.flashsaleproject.validator.ValidatorImpl;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +38,8 @@ public class ItemServiceImpl implements ItemService {
     private ItemDOMapper itemDOMapper;
     @Autowired
     private ItemStockDOMapper itemStockDOMapper;
+    @Autowired
+    private PromoService promoService;
 
     @Override
     @Transactional
@@ -107,6 +113,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemModel getItemById(Integer id) {
+
+        // get the itemDO
         ItemDO itemDO = itemDOMapper.selectByPrimaryKey(id);
         if (itemDO == null) {
             return null;
@@ -116,6 +124,13 @@ public class ItemServiceImpl implements ItemService {
 
         // convert itemDO and itemStockDO to itemModel
         ItemModel itemModel = this.convertFromItemDO(itemDO, itemStockDO);
+
+        // get the promoModel
+        PromoModel promoModel = promoService.getPromoByItemId(itemModel.getId());
+        if (promoModel != null && promoModel.getStatus() != 3) { // 3 means the promo is not started
+            itemModel.setPromoModel(promoModel);
+        }
+
         return itemModel;
     }
 

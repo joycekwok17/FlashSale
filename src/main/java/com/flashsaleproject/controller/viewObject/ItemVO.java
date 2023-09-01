@@ -1,5 +1,7 @@
 package com.flashsaleproject.controller.viewObject;
 
+import org.joda.time.DateTime;
+
 import java.math.BigDecimal;
 
 /**
@@ -28,6 +30,45 @@ public class ItemVO {
 
     //商品描述图片的url
     private String imgUrl;
+
+    // 0 means no promo activity, 1 means promo activity not start, 2 means promo activity ongoing
+    private Integer promoStatus;
+
+    private BigDecimal promoPrice;
+    private Integer promoId;
+    private String promoStartDate;
+
+    public Integer getPromoStatus() {
+        return promoStatus;
+    }
+
+    public void setPromoStatus(Integer promoStatus) {
+        this.promoStatus = promoStatus;
+    }
+
+    public BigDecimal getPromoPrice() {
+        return promoPrice;
+    }
+
+    public void setPromoPrice(BigDecimal promoPrice) {
+        this.promoPrice = promoPrice;
+    }
+
+    public Integer getPromoId() {
+        return promoId;
+    }
+
+    public void setPromoId(Integer promoId) {
+        this.promoId = promoId;
+    }
+
+    public String getPromoStartDate() {
+        return promoStartDate;
+    }
+
+    public void setPromoStartDate(String promoStartDate) {
+        this.promoStartDate = promoStartDate;
+    }
 
     public Integer getId() {
         return id;

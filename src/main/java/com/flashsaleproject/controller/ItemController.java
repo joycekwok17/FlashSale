@@ -5,13 +5,14 @@ import com.flashsaleproject.error.BusinessException;
 import com.flashsaleproject.response.CommonReturnType;
 import com.flashsaleproject.service.ItemService;
 import com.flashsaleproject.service.model.ItemModel;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,15 @@ public class ItemController extends BaseController {
         }
         ItemVO itemVO = new ItemVO();
         BeanUtils.copyProperties(itemModel, itemVO);
+        if (itemModel.getPromoModel() != null) {
+            // this item has promo activity
+            itemVO.setPromoStatus(itemModel.getPromoModel().getStatus());
+            itemVO.setPromoId(itemModel.getPromoModel().getId());
+            itemVO.setPromoPrice(itemModel.getPromoModel().getPromoItemPrice());
+            itemVO.setPromoStartDate(itemModel.getPromoModel().getStartDate().toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
+        } else {
+            itemVO.setPromoStatus(0); // no promo activity
+        }
         return itemVO;
     }
 

@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public OrderModel createOrder(Integer userId, Integer itemId, Integer amount) throws BusinessException {
+    public OrderModel createOrder(Integer userId, Integer itemId, Integer promoId, Integer amount) throws BusinessException {
         // validate the input parameters here        // check the item is available
         ItemModel itemModel = itemService.getItemById(itemId);
         if (itemModel == null) {
@@ -52,9 +52,21 @@ public class OrderServiceImpl implements OrderService {
         if (userModel == null) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "User does not exist");
         }
+        // check the amount is valid
         if (amount <= 0 || amount > 99) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "Amount is not valid");
         }
+
+        // check the promo is valid
+        if (promoId != null) {
+            // check the promo is for this item
+            if (promoId.intValue() != itemModel.getPromoModel().getId()) {
+                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "Promo is not valid");
+            } else if (itemModel.getPromoModel().getStatus().intValue() != 2) {
+                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "Promo has not started");
+            }
+        }
+
         // deduct the item stock
         boolean result = itemService.decreaseStock(itemId, amount);
         if (!result) {
@@ -65,7 +77,15 @@ public class OrderServiceImpl implements OrderService {
         orderModel.setUserId(userId);
         orderModel.setItemId(itemId);
         orderModel.setAmount(amount);
-        orderModel.setItemPrice(itemModel.getPrice());
+
+        // set the item price to the promo price if there is a promo
+        if (promoId != null) {
+            orderModel.setItemPrice(itemModel.getPromoModel().getPromoItemPrice());
+        } else {
+            // set the item price to the original price if there is no promo
+            orderModel.setItemPrice(itemModel.getPrice());
+        }
+        orderModel.setPromoId(promoId);
         orderModel.setOrderPrice(itemModel.getPrice().multiply(new java.math.BigDecimal(amount)));
 
         // generate the order id and set it to orderModel
